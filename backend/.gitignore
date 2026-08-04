@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+solar_safe.db
+
+uploads/*
+reports/*
