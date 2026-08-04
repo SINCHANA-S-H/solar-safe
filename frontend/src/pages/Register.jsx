@@ -1,15 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
 function Register() {
-
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl p-10 w-[420px]">
 
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-[420px]">
-
-        <h1 className="text-4xl font-bold text-center text-green-700">
+        <h1 className="text-4xl font-bold text-green-700 text-center">
           🌞 Solar Safe
         </h1>
 
@@ -32,7 +30,7 @@ function Register() {
         <input
           type="text"
           placeholder="Enter your full name"
-          className="w-full border rounded-lg p-3 mb-4"
+          className="w-full border border-gray-300 rounded-lg p-3 mb-4"
         />
 
         <label className="block font-medium mb-2">
@@ -42,7 +40,7 @@ function Register() {
         <input
           type="email"
           placeholder="Enter your email"
-          className="w-full border rounded-lg p-3 mb-4"
+          className="w-full border border-gray-300 rounded-lg p-3 mb-4"
         />
 
         <label className="block font-medium mb-2">
@@ -52,7 +50,7 @@ function Register() {
         <input
           type="password"
           placeholder="Enter your password"
-          className="w-full border rounded-lg p-3 mb-4"
+          className="w-full border border-gray-300 rounded-lg p-3 mb-4"
         />
 
         <label className="block font-medium mb-2">
@@ -62,7 +60,7 @@ function Register() {
         <input
           type="password"
           placeholder="Confirm your password"
-          className="w-full border rounded-lg p-3"
+          className="w-full border border-gray-300 rounded-lg p-3"
         />
 
         <button
@@ -74,16 +72,15 @@ function Register() {
 
         <p className="text-center mt-6 text-gray-600">
           Already have an account?{" "}
-          <a
-            href="/"
-            className="text-green-600 font-semibold hover:underline"
+          <span
+            onClick={() => navigate("/")}
+            className="text-green-600 font-semibold cursor-pointer hover:underline"
           >
             Login
-          </a>
+          </span>
         </p>
 
       </div>
-
     </div>
   );
 }
