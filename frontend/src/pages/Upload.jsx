@@ -1,5 +1,28 @@
+import { useState } from "react";
+
+import UploadCard from "../components/UploadCard";
+import PredictionCard from "../components/PredictionCard";
+import GradCAMViewer from "../components/GradCAMViewer";
+import AIAnalysis from "../components/AIAnalysis";
+
 function Upload() {
-  return <h1>Upload Page</h1>;
+
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  return (
+    <>
+      <UploadCard
+        selectedImage={selectedImage}
+        setSelectedImage={setSelectedImage}
+      />
+
+      <PredictionCard selectedImage={selectedImage} />
+
+      <GradCAMViewer selectedImage={selectedImage} />
+
+      <AIAnalysis />
+    </>
+  );
 }
 
 export default Upload;

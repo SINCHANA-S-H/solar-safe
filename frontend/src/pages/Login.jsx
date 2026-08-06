@@ -3,15 +3,15 @@ function Login() {
     const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-sky blue-100">
 
       <div className="bg-white rounded-2xl shadow-xl p-10 w-[420px]">
 
-        <h1 className="text-5xl font-bold text-green-700 text-center">
-          🌞 Solar Safe
+        <h1 className="text-5xl font-bold text-lavender-700 text-center">
+          SolarSafe AI Portal
         </h1>
 
-        <p className="text-center text-gray-500 mt-3">
+        <p className="text-center text-lavender-500 mt-3">
           Edge AI Powered PV Fault Detection
         </p>
 
@@ -19,7 +19,7 @@ function Login() {
           Welcome Back
         </h2>
 
-        <p className="text-center text-gray-500 mb-8">
+        <p className="text-center text-lavender-500 mb-8">
           Login to continue
         </p>
 
@@ -52,11 +52,11 @@ function Login() {
 >
   Login
 </button>
-<p className="text-center mt-6 text-gray-600">
+<p className="text-center mt-6 text-lavender-500">
   Don't have an account?{" "}
   <a
     href="/register"
-    className="text-green-600 font-semibold hover:underline"
+    className="text-lavender-600 font-semibold hover:underline"
   >
     Register
   </a>
