@@ -1,0 +1,32 @@
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# SolarSafe dataset - DO NOT PUSH
+ai/dataset/
+
+# Generated training outputs
+ai/outputs/
+
+# ZIP/archive files
+*.zip
+
+# Environment files
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
