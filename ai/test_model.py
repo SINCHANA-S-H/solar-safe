@@ -53,16 +53,13 @@ def predict_single(image_path, model=None):
     pred_class = CLASS_NAMES[pred_idx]
     confidence = float(raw_preds[pred_idx] * 100)
 
-    print("\n" + "=" * 55)
-    print("SOLARSAFE AI — PREDICTION REPORT")
-    print("=" * 55)
-    print(f"Image       : {img_path.name}")
-    print(f"Prediction  : {pred_class}")
-    print(f"Confidence  : {confidence:.2f}%\n")
-    print("Class Probabilities:")
+    print(f"\nImage: {img_path.name}\n")
+    print(f"Prediction: {pred_class}\n")
+    print(f"Confidence: {confidence:.1f}%\n")
+    print("Probabilities:\n")
     for cls, score in zip(CLASS_NAMES, raw_preds):
-        print(f"  {cls:<15}: {score:.4f} ({score * 100:.2f}%)")
-    print("=" * 55 + "\n")
+        print(f"{cls}: {score * 100:.1f}%")
+    print()
 
     return {
         "prediction": pred_class,
@@ -149,13 +146,15 @@ def run_evaluation_suite(model=None, samples_per_class=10):
 
 def main():
     parser = argparse.ArgumentParser(description="SolarSafe AI - Model Verification & Test")
+    parser.add_argument("positional_image", nargs="?", type=str, help="Path to solar panel image for single prediction")
     parser.add_argument("--image", type=str, help="Path to solar panel image for single prediction")
     parser.add_argument("--test-suite", action="store_true", help="Run comprehensive evaluation on test suite")
     parser.add_argument("--samples", type=int, default=15, help="Samples per class for test suite")
     args = parser.parse_args()
 
-    if args.image:
-        predict_single(args.image)
+    target_image = args.image or args.positional_image
+    if target_image:
+        predict_single(target_image)
     else:
         run_evaluation_suite(samples_per_class=args.samples)
 
