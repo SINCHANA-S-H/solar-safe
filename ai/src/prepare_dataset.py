@@ -44,7 +44,10 @@ CLASS_NAMES: List[str] = [
 EOR_LABEL_MAP: Dict[str, str] = {
     "No-Anomaly": "Normal",
     "Hot-Spot": "Hotspot",
-    "Cell": "Cell_Crack",
+    "Hot-Spot-Multi": "Hotspot",
+    "Cell": "Hotspot",
+    "Cell-Multi": "Hotspot",
+    "Cracking": "Cell_Crack",
 }
 
 

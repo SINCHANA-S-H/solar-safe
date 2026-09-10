@@ -25,6 +25,7 @@ from config import (
     BATCH_SIZE,
     CLASS_NAMES,
     BEST_MODEL_PATH,
+    FINAL_MODEL_PATH,
     EVALUATION_DIR,
     REPORTS_DIR,
     CONFUSION_MATRIX,
@@ -50,8 +51,9 @@ def evaluate_model():
     class_names = test_dataset.class_names
     print(f"Test Class Names: {class_names}")
 
-    print(f"\nLoading best trained model from: {BEST_MODEL_PATH}\n")
-    model = tf.keras.models.load_model(BEST_MODEL_PATH)
+    model_path = BEST_MODEL_PATH if BEST_MODEL_PATH.exists() else FINAL_MODEL_PATH
+    print(f"\nLoading trained model from: {model_path}\n")
+    model = tf.keras.models.load_model(model_path, compile=False)
 
     print("Evaluating model performance on test dataset...")
     loss, accuracy = model.evaluate(test_dataset, verbose=1)

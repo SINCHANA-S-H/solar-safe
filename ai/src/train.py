@@ -248,9 +248,14 @@ if __name__ == "__main__":
 
     print("\nTraining Completed Successfully.")
 
-    # Save final model
-    model.save(FINAL_MODEL_PATH)
-    print(f"\nFinal Model Saved At: {FINAL_MODEL_PATH}")
+    # Ensure final model has the best checkpoint weights
+    if BEST_MODEL_PATH.exists():
+        import shutil
+        shutil.copy2(BEST_MODEL_PATH, FINAL_MODEL_PATH)
+        print(f"\nCopied best checkpoint to Final Model: {FINAL_MODEL_PATH}")
+    else:
+        model.save(FINAL_MODEL_PATH)
+        print(f"\nFinal Model Saved At: {FINAL_MODEL_PATH}")
     print(f"Best Model Saved At : {BEST_MODEL_PATH}")
 
     print("\nEvaluating Model on Validation Set...\n")

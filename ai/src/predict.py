@@ -15,14 +15,15 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-from config import BEST_MODEL_PATH, CLASS_NAMES
+from config import BEST_MODEL_PATH, FINAL_MODEL_PATH, CLASS_NAMES
 from preprocessing import ImagePreprocessor
 
 
 def load_solar_model():
-    if not BEST_MODEL_PATH.exists():
-        raise FileNotFoundError(f"Model file not found at: {BEST_MODEL_PATH}")
-    return tf.keras.models.load_model(BEST_MODEL_PATH)
+    model_path = FINAL_MODEL_PATH if FINAL_MODEL_PATH.exists() else BEST_MODEL_PATH
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model file not found at: {FINAL_MODEL_PATH} or {BEST_MODEL_PATH}")
+    return tf.keras.models.load_model(model_path, compile=False)
 
 
 def predict_image(image_path, model=None):

@@ -74,11 +74,11 @@ NUM_CLASSES = len(CLASS_NAMES)
 # TRAINING SETTINGS
 # ============================================================
 
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 
-INITIAL_EPOCHS = 5
+INITIAL_EPOCHS = 4
 
-FINE_TUNE_EPOCHS = 15
+FINE_TUNE_EPOCHS = 8
 
 INITIAL_LEARNING_RATE = 1e-4
 
@@ -152,9 +152,9 @@ GRADCAM_SUMMARY_PATH = GRADCAM_DIR / "gradcam_summary.png"
 # CALLBACK SETTINGS
 # ============================================================
 
-PATIENCE = 5
+PATIENCE = 3
 
-LR_PATIENCE = 3
+LR_PATIENCE = 2
 
 MIN_LR = 1e-7
 
