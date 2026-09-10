@@ -17,6 +17,19 @@ export default function Upload() {
   const [error, setError] = useState(null);
   const [predictionData, setPredictionData] = useState(null);
 
+  // Grad-CAM specific state
+  const [gradCamImageUrl, setGradCamImageUrl] = useState(null);
+  const [isGradCamLoading, setIsGradCamLoading] = useState(false);
+  const [gradCamError, setGradCamError] = useState(null);
+
+  // When a new image is selected or removed, wipe old analysis state
+  const handleFileSelected = () => {
+    setPredictionData(null);
+    setGradCamImageUrl(null);
+    setGradCamError(null);
+    setError(null);
+  };
+
   const handleAnalyze = async () => {
     if (!selectedFile || !user?.email) {
       setError("Please select a solar panel image first.");
@@ -24,18 +37,19 @@ export default function Upload() {
     }
 
     setError(null);
+    setGradCamError(null);
+    setGradCamImageUrl(null);
     setIsAnalyzing(true);
     setAnalysisStage("Uploading image to Solar Safe backend...");
 
     try {
-      // Simulate stage transitions for visual feedback
       setTimeout(() => {
         setAnalysisStage("Running MobileNetV2 feature extraction...");
-      }, 700);
+      }, 500);
 
       setTimeout(() => {
         setAnalysisStage("Computing class probabilities and anomaly confidence...");
-      }, 1500);
+      }, 1100);
 
       const response = await predictionService.predictImage(
         selectedFile,
@@ -43,13 +57,56 @@ export default function Upload() {
       );
 
       setPredictionData(response);
+      setIsAnalyzing(false);
+
+      // Trigger Grad-CAM generation with separate loading state
+      setIsGradCamLoading(true);
+
+      let gradCamCandidateUrl = null;
+      if (response.gradcam_image) {
+        gradCamCandidateUrl = predictionService.getGradCamUrl(response.gradcam_image);
+      } else if (response.image_name) {
+        const stem = response.image_name.replace(/\.[^/.]+$/, "");
+        gradCamCandidateUrl = predictionService.getGradCamUrl(`/uploads/gradcam_${stem}.png`);
+      }
+
+      if (gradCamCandidateUrl) {
+        const img = new Image();
+        img.onload = () => {
+          setGradCamImageUrl(gradCamCandidateUrl);
+          setIsGradCamLoading(false);
+        };
+        img.onerror = () => {
+          // Fallback to dedicated endpoint /gradcam/{image_name}
+          if (response.image_name) {
+            const fallbackUrl = predictionService.getGradCamUrl(`/gradcam/${response.image_name}`);
+            const imgFallback = new Image();
+            imgFallback.onload = () => {
+              setGradCamImageUrl(fallbackUrl);
+              setIsGradCamLoading(false);
+            };
+            imgFallback.onerror = () => {
+              setGradCamError("AI explanation is currently unavailable.");
+              setIsGradCamLoading(false);
+            };
+            imgFallback.src = fallbackUrl;
+          } else {
+            setGradCamError("AI explanation is currently unavailable.");
+            setIsGradCamLoading(false);
+          }
+        };
+        img.src = gradCamCandidateUrl;
+      } else {
+        setGradCamError("AI explanation is currently unavailable.");
+        setIsGradCamLoading(false);
+      }
     } catch (err) {
       setError(
         err.message ||
           "Failed to process image prediction. Please ensure the Solar Safe backend is running."
       );
-    } finally {
       setIsAnalyzing(false);
+    } finally {
       setAnalysisStage("");
     }
   };
@@ -58,6 +115,9 @@ export default function Upload() {
     setSelectedFile(null);
     setImagePreview(null);
     setPredictionData(null);
+    setGradCamImageUrl(null);
+    setGradCamError(null);
+    setIsGradCamLoading(false);
     setError(null);
   };
 
@@ -94,6 +154,7 @@ export default function Upload() {
             analysisStage={analysisStage}
             error={error}
             setError={setError}
+            onFileSelected={handleFileSelected}
           />
 
           {/* Model Specification Card */}
@@ -128,31 +189,50 @@ export default function Upload() {
                 onReset={handleReset}
               />
               <AIAnalysis predictionData={predictionData} />
-              <GradCAMViewer />
+              <GradCAMViewer
+                gradCamImageUrl={gradCamImageUrl}
+                originalImageUrl={imagePreview}
+                isLoading={isGradCamLoading}
+                hasAnalyzed={Boolean(predictionData)}
+                error={gradCamError}
+                prediction={predictionData?.prediction}
+                confidence={predictionData?.confidence}
+              />
             </>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-8 sm:p-12 text-center flex flex-col items-center justify-center min-h-[420px]">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                AI Diagnostics Awaiting Input
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-md mt-1.5 leading-relaxed">
-                Select a solar panel image on the left and click <strong>"Analyze Panel with AI"</strong>.
-                The system will compute class probabilities, risk assessment, and technical recommendations.
-              </p>
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-8 sm:p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                  <Sparkles className="w-8 h-8 text-emerald-600" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                  AI Diagnostics Awaiting Input
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 max-w-md mt-1.5 leading-relaxed">
+                  Select a solar panel image on the left and click <strong>"Analyze Panel with AI"</strong>.
+                  The system will compute class probabilities, risk assessment, and technical recommendations.
+                </p>
 
-              <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md w-full text-left text-xs text-slate-600">
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Real-time ML Confidence</span>
-                </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
-                  <Cpu className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>MobileNetV2 Classification</span>
+                <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md w-full text-left text-xs text-slate-600">
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Real-time ML Confidence</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50">
+                    <Cpu className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>MobileNetV2 Classification</span>
+                  </div>
                 </div>
               </div>
+
+              {/* Show Grad-CAM placeholder before analysis */}
+              <GradCAMViewer
+                gradCamImageUrl={null}
+                originalImageUrl={imagePreview}
+                isLoading={false}
+                hasAnalyzed={false}
+                error={null}
+              />
             </div>
           )}
         </div>

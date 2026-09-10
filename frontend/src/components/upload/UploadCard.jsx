@@ -11,6 +11,7 @@ export default function UploadCard({
   analysisStage,
   error,
   setError,
+  onFileSelected,
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
@@ -29,6 +30,10 @@ export default function UploadCard({
     if (file.size > 15 * 1024 * 1024) {
       setError("File size exceeds 15MB. Please upload a smaller solar panel image.");
       return;
+    }
+
+    if (onFileSelected) {
+      onFileSelected();
     }
 
     setSelectedFile(file);
@@ -66,6 +71,9 @@ export default function UploadCard({
     setSelectedFile(null);
     setImagePreview(null);
     setError(null);
+    if (onFileSelected) {
+      onFileSelected();
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
