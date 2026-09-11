@@ -62,7 +62,7 @@ export default function Register() {
       await register(username.trim(), email.trim(), password);
       setSuccess("Account created successfully! Redirecting to login...");
       setTimeout(() => {
-        navigate("/");
+        navigate("/", { state: { email: email.trim() } });
       }, 1500);
     } catch (err) {
       setError(err.message || "Failed to create account. Please try again.");
