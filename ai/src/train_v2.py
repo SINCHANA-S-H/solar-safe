@@ -96,14 +96,14 @@ EXPERIMENT_CONFIGS = {
 
 # Training hyperparameters (shared)
 PHASE1_EPOCHS = 8
-PHASE2_MAX_EPOCHS = 25
-PHASE1_LR = 1e-4
-PHASE2_LR = 5e-6
-FINE_TUNE_UNFREEZE_TOP = 50
-EARLY_STOP_PATIENCE = 7
-REDUCE_LR_PATIENCE = 4
+PHASE2_MAX_EPOCHS = 18
+PHASE1_LR = 2e-4
+PHASE2_LR = 1e-5
+FINE_TUNE_UNFREEZE_TOP = 40
+EARLY_STOP_PATIENCE = 5
+REDUCE_LR_PATIENCE = 3
 REDUCE_LR_FACTOR = 0.3
-MIN_LR = 1e-8
+MIN_LR = 1e-7
 
 
 # ============================================================
@@ -223,7 +223,7 @@ def build_callbacks(out_dir: Path, model_filename: str, csv_filename: str):
     return [
         ModelCheckpoint(
             filepath=str(out_dir / model_filename),
-            monitor="val_accuracy",
+            monitor="val_loss",
             save_best_only=True,
             verbose=1,
         ),
@@ -402,8 +402,8 @@ def train(experiment_key: str):
     verify_class_order(train_ds, "Train")
     verify_class_order(val_ds,   "Validation")
 
-    train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
-    val_ds   = val_ds.prefetch(tf.data.AUTOTUNE)
+    train_ds = train_ds.cache().prefetch(tf.data.AUTOTUNE)
+    val_ds   = val_ds.cache().prefetch(tf.data.AUTOTUNE)
 
     # ---- Class weights ----
     if cfg["use_class_weights"]:

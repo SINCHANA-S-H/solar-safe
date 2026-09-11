@@ -34,7 +34,7 @@ def export_tflite():
         raise FileNotFoundError(f"Model file not found at: {model_path}")
 
     print(f"Loading Keras model from: {model_path}")
-    keras_model = tf.keras.models.load_model(model_path)
+    keras_model = tf.keras.models.load_model(model_path, compile=False)
 
     # ---------------------------------------------------------
     # Generate labels.txt

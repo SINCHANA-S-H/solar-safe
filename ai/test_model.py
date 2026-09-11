@@ -53,13 +53,20 @@ def predict_single(image_path, model=None):
     pred_class = CLASS_NAMES[pred_idx]
     confidence = float(raw_preds[pred_idx] * 100)
 
-    print(f"\nImage: {img_path.name}\n")
-    print(f"Prediction: {pred_class}\n")
-    print(f"Confidence: {confidence:.1f}%\n")
-    print("Probabilities:\n")
-    for cls, score in zip(CLASS_NAMES, raw_preds):
-        print(f"{cls}: {score * 100:.1f}%")
-    print()
+    actual_class = "Unknown (External Image)"
+    path_str = str(img_path).lower()
+    for cls in CLASS_NAMES:
+        if cls.lower() in path_str or cls.lower().replace("_", "") in path_str:
+            actual_class = cls
+            break
+
+    print(f"Image:\n{img_path.name}\n")
+    print(f"Actual class:\n{actual_class}\n")
+    print(f"Prediction:\n{pred_class}\n")
+    print(f"Confidence:\n{confidence:.2f}%\n")
+    print(f"Normal:\n{raw_preds[CLASS_NAMES.index('Normal')] * 100:.2f}%\n")
+    print(f"Hotspot:\n{raw_preds[CLASS_NAMES.index('Hotspot')] * 100:.2f}%\n")
+    print(f"Cell_Crack:\n{raw_preds[CLASS_NAMES.index('Cell_Crack')] * 100:.2f}%")
 
     return {
         "prediction": pred_class,
