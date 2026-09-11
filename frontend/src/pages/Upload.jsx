@@ -6,6 +6,7 @@ import PredictionCard from "../components/upload/PredictionCard";
 import AIAnalysis from "../components/upload/AIAnalysis";
 import GradCAMViewer from "../components/upload/GradCAMViewer";
 import { Cpu, Sparkles, Layers, ShieldCheck } from "lucide-react";
+import { playChime } from "../utils/sound";
 
 export default function Upload() {
   const { user } = useAuth();
@@ -58,6 +59,10 @@ export default function Upload() {
 
       setPredictionData(response);
       setIsAnalyzing(false);
+
+      if (localStorage.getItem("solarsafe_audio_notifications") === "true") {
+        playChime();
+      }
 
       // Trigger Grad-CAM generation with separate loading state
       setIsGradCamLoading(true);

@@ -125,6 +125,17 @@ export default function PredictionCard({
             </p>
           </div>
         </div>
+
+        {/* Prominent High-Risk Warning Alert (controlled by Settings preference) */}
+        {(prediction === "Hotspot" || prediction === "Cell_Crack") &&
+          localStorage.getItem("solarsafe_high_risk_alerts") !== "false" && (
+            <div className="mt-3 p-3.5 rounded-xl bg-rose-600 text-white flex items-center justify-between gap-3 shadow-md animate-pulse">
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+                <AlertTriangle className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>CRITICAL ANOMALY DETECTED: Urgent solar array safety inspection required!</span>
+              </div>
+            </div>
+        )}
       </div>
 
       {/* Confidence Score */}

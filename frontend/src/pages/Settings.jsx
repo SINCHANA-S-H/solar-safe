@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { API_BASE_URL } from "../services/api";
+import { playChime } from "../utils/sound";
 import {
   User,
   Mail,
@@ -34,7 +35,7 @@ export default function Settings() {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Apply theme dynamically
+  // Apply theme dynamically and immediately
   const applyTheme = (mode) => {
     setThemeMode(mode);
     if (mode === "dark") {
@@ -42,6 +43,7 @@ export default function Settings() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem("solarsafe_theme", mode);
   };
 
   const handleSavePreferences = () => {
@@ -53,6 +55,10 @@ export default function Settings() {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
+    }
+
+    if (notificationsEnabled) {
+      playChime();
     }
 
     setSavedSuccess(true);
@@ -194,7 +200,11 @@ export default function Settings() {
               type="checkbox"
               id="audio-chime"
               checked={notificationsEnabled}
-              onChange={(e) => setNotificationsEnabled(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setNotificationsEnabled(checked);
+                if (checked) playChime();
+              }}
               className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
             />
           </div>
@@ -223,13 +233,19 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-2 flex flex-wrap items-center gap-3">
           <button
             onClick={handleSavePreferences}
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-xs transition active:scale-95"
+            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer"
           >
             Save Client Preferences
           </button>
+          {savedSuccess && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 animate-fade-in bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Saved & applied successfully!</span>
+            </span>
+          )}
         </div>
       </div>
 
