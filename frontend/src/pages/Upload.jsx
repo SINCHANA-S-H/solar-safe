@@ -77,23 +77,30 @@ export default function Upload() {
           setIsGradCamLoading(false);
         };
         img.onerror = () => {
-          // Fallback to dedicated endpoint /gradcam/{image_name}
-          if (response.image_name) {
-            const fallbackUrl = predictionService.getGradCamUrl(`/gradcam/${response.image_name}`);
-            const imgFallback = new Image();
-            imgFallback.onload = () => {
-              setGradCamImageUrl(fallbackUrl);
-              setIsGradCamLoading(false);
-            };
-            imgFallback.onerror = () => {
+          const stem = response.image_name ? response.image_name.replace(/\.[^/.]+$/, "") : "";
+          const fallbackCandidates = [
+            predictionService.getGradCamUrl(`/uploads/gradcam_${stem}.png`),
+            predictionService.getGradCamUrl(`/gradcam/${stem}`),
+            predictionService.getGradCamUrl(`/gradcam/${response.image_name}`),
+          ].filter(Boolean);
+
+          let candidateIdx = 0;
+          const tryNext = () => {
+            if (candidateIdx < fallbackCandidates.length) {
+              const url = fallbackCandidates[candidateIdx++];
+              const testImg = new Image();
+              testImg.onload = () => {
+                setGradCamImageUrl(url);
+                setIsGradCamLoading(false);
+              };
+              testImg.onerror = tryNext;
+              testImg.src = url;
+            } else {
               setGradCamError("AI explanation is currently unavailable.");
               setIsGradCamLoading(false);
-            };
-            imgFallback.src = fallbackUrl;
-          } else {
-            setGradCamError("AI explanation is currently unavailable.");
-            setIsGradCamLoading(false);
-          }
+            }
+          };
+          tryNext();
         };
         img.src = gradCamCandidateUrl;
       } else {

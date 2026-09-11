@@ -107,6 +107,9 @@ export default function SolarMap() {
       });
 
       mapInstanceRef.current = map;
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 250);
     }
 
     return () => {
